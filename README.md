@@ -20,7 +20,7 @@ Coda   →  closes (test → deploy → verify)
 
 ## Shared foundations
 
-**`skills/`** — The six skill definitions used by all agents. Copy into your project's `.claude/commands/` to get the full workflow:
+**`skills/`** — The seven skill definitions used by all agents. Copy into your project's `.claude/commands/` to get the full workflow:
 
 | Skill | What it does |
 |---|---|
@@ -30,6 +30,7 @@ Coda   →  closes (test → deploy → verify)
 | `/create-tracker` | Generates an IMPLEMENTATION.md from the task docs |
 | `/implement` | Implements a single task within its defined scope |
 | `/create-pr` | Generates the PR description on completion |
+| `/reprise` | Posts a retrospective GitHub issue: goal vs delivered, shortcomings, skill improvements |
 
 **`templates/`** — Drop-in starting points for adopting this workflow on any project.
 
