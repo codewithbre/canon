@@ -78,7 +78,9 @@ canon/
 ├── docs/
 │   ├── philosophy.md      Why constraints enable AI
 │   ├── workflow.md        The full skill chain with worked example
-│   └── architecture.md    Current and future multi-agent architecture
+│   ├── architecture.md    Current and future multi-agent architecture
+│   ├── runtime-design.md  TypeScript runtime: two modes, LangChain, LangSmith, GitHub Actions
+│   └── token-efficiency.md  Where token budget goes and how to reduce it
 ├── skills/                The six skill definitions (copy these into your project)
 │   ├── breakdown.md
 │   ├── write-task.md
@@ -86,6 +88,7 @@ canon/
 │   ├── create-tracker.md
 │   ├── implement.md
 │   └── create-pr.md
+├── runtime/               TypeScript orchestrator (programmatic API mode) — coming soon
 └── templates/
     ├── CLAUDE.md          Template CLAUDE.md for adopting projects
     └── IMPLEMENTATION.md  Template tracker for adopting projects
