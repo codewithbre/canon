@@ -86,7 +86,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/llm.ts` exporting `createLLM()` — a configured `ChatAnthropic` instance with automatic LangSmith tracing when env vars are present.
 **Depends on:** Task 01
 
-- [ ] Task 03 complete (PR merged)
+- [x] Task 03 complete (PR merged) — PR #5, merged 2026-06-20
 
 ---
 
