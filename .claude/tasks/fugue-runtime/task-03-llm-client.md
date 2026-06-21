@@ -84,17 +84,28 @@ export async function invokeLLM(
 }
 ```
 
+### Model selection
+
+Each tool specifies its own model. `createLLM()` accepts an optional `model` parameter; `ANTHROPIC_MODEL` env var overrides everything.
+
+| Call | Model | Reason |
+|---|---|---|
+| breakdown | `claude-sonnet-4-6` | Generates planning artifacts — quality determines all downstream output |
+| write-task | `claude-sonnet-4-6` | Produces task docs — structural reasoning required |
+| verify-task | `claude-haiku-4-5-20251001` | Structural evaluation — checks presence of sections, not creative generation |
+| reprise | `claude-haiku-4-5-20251001` | Formats provided run data — no reasoning required |
+
 ### Implementation
 
 ```typescript
 import { ChatAnthropic } from '@langchain/anthropic';
 
-export function createLLM(): ChatAnthropic {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+export function createLLM(model = 'claude-haiku-4-5-20251001'): ChatAnthropic {
+  const apiKey = process.env['ANTHROPIC_API_KEY'];
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is required');
 
   return new ChatAnthropic({
-    model: process.env.ANTHROPIC_MODEL ?? 'claude-opus-4-8',
+    model: process.env['ANTHROPIC_MODEL'] ?? model,
     temperature: 0,
     anthropicApiKey: apiKey,
   });
