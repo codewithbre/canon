@@ -1,0 +1,36 @@
+name: Fugue
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  run:
+    if: github.event.label.name == 'fugue'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Fugue
+        run: |
+          npx tsx packages/fugue/runtime/src/index.ts \
+            --task "${{ github.event.issue.title }}" \
+            --repo "${{ github.repository }}" \
+            --issue "${{ github.event.issue.number }}"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+          LANGCHAIN_TRACING_V2: 'true'
+          LANGCHAIN_PROJECT: 'fugue'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
