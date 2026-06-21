@@ -66,7 +66,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `packages/fugue/runtime/` with `package.json`, `tsconfig.json`, `.env.example`, and empty src structure. Installs all dependencies.
 **Depends on:** Nothing
 
-- [ ] Task 01 complete (PR merged)
+- [x] Task 01 complete (PR merged) — PR #1, merged 2026-06-20
 
 ---
 
@@ -274,8 +274,18 @@ Run `/reprise` to generate the retrospective GitHub issue:
 
 ```
 Last session: 2026-06-20
-Current task: Not started — Task 01 is first
-Status: All 11 task docs written and verified. IMPLEMENTATION.md generated. Ready to implement.
-Branch: main
-Next action: Start Task 01 — create packages/fugue/runtime/ scaffold
+Current task: Task 01 complete. Task 02 is next.
+Status: Task 01 merged (PR #1). Runtime scaffold exists locally at
+  packages/fugue/runtime/ — gitignored, not in public repo.
+  Task docs and IMPLEMENTATION.md now public on main.
+  pnpm install and pnpm --filter fugue-runtime typecheck both pass locally.
+Branch: main (clean)
+Next action: Task 02 (skill-loader) on branch task-02-skill-loader.
+  Tasks 02, 03, and 07 are all unblocked — no mutual dependencies.
+Key decisions carried forward:
+  - invokeLLM() wrapper (not llm.invoke()) — Task 03
+  - fanOut() with allSettled + retry-after — Task 08
+  - OrchestrationContext.limits and .failures — Task 08
+  - Prompt caching: stable content first in message array — Tasks 04-06
+  - pnpm workspace command: pnpm --filter fugue-runtime typecheck (not pnpm typecheck --filter)
 ```
