@@ -96,7 +96,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/github.ts` with `getDefaultBranch`, `createBranch`, `commitFile`, `openPR`, `postComment`, and `createIssue` functions via `@octokit/rest`.
 **Depends on:** Task 01
 
-- [ ] Task 07 complete (PR merged)
+- [x] Task 07 complete (PR merged) — PR #6, merged 2026-06-20
 
 ---
 
