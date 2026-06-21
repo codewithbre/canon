@@ -126,7 +126,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/tools/verify-task.ts`. `runVerifyTask()` calls Claude with the verify-task skill and returns `{ confidence, gaps }` via Zod structured output.
 **Depends on:** Tasks 02, 03, 05 (needs `TaskDoc` type)
 
-- [ ] Task 06 complete (PR merged)
+- [x] Task 06 complete (PR merged) — PR #10, merged 2026-06-21
 
 ---
 
