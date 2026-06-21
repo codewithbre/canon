@@ -116,7 +116,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/tools/write-task.ts`. `runWriteTask()` calls Claude with the write-task skill and returns a `TaskDoc` (`filename` + `content`) ready to commit.
 **Depends on:** Tasks 02, 03, 04 (needs `Task` type)
 
-- [ ] Task 05 complete (PR merged)
+- [x] Task 05 complete (PR merged) — PR #9, merged 2026-06-21
 
 ---
 
