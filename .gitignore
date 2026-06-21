@@ -1,0 +1,20 @@
+# Package source code — kept private; docs, skills, and templates are public
+packages/
+
+# Claude Code local config
+.claude/settings.local.json
+.claude/settings.json
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Environment files
+.env
+
+# Build output
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
