@@ -4,6 +4,13 @@ the codebase and this document, must be able to complete the task
 without any other context (this conversation, a breakdown list, or
 other task documents).
 
+**If this project uses programmatic orchestration (Fugue or similar):**
+A `skills/write-task-api.md` variant is required alongside this skill.
+The `-api` variant produces the document directly with no questions,
+no tool invocations, and no narration. This skill's "ASK where to save"
+instruction (step 5) is incompatible with API use — the `-api` variant
+removes it. Verify the `-api` variant exists before beginning implementation.
+
 Do not implement anything. This is documentation only.
 
 1. ANALYZE the codebase to confirm the task is valid per Task Integrity
@@ -55,6 +62,18 @@ Do not implement anything. This is documentation only.
    corresponding to one task. By convention, one task corresponds to
    one PR's worth of work - name and scope the document accordingly
    (e.g. tasks/<task-name>.md).
+
+   If the task creates an LLM client or tool wrapper, include a model
+   selection table in the Context section:
+
+   | Call | Model | Reason |
+   |---|---|---|
+   | planning/generation calls | `claude-sonnet-4-6` | Reasoning quality required |
+   | evaluation/formatting calls | `claude-haiku-4-5-20251001` | Structural check only |
+
+   If the task calls `llm.invoke()` directly, add this note to Context:
+   "`response.content` may be a string or a `MessageContent` array.
+   Use an `extractText(content)` helper that handles both forms."
 
 5. ASK where to save the document (e.g. a tasks/ directory) if not
    specified. Do not write the file until a location is confirmed.

@@ -79,6 +79,24 @@ Task A
 
 ---
 
+## Pre-flight checklist
+
+Before the first implementation session, verify the following are either
+already present or covered by a task doc:
+
+- [ ] Workspace config (`pnpm-workspace.yaml`, `turbo.json`, etc.) recognizes
+      the new package. If not, add it to the first task's scope.
+- [ ] Runtime devDependency for executing TypeScript exists (`tsx`, `ts-node`,
+      or equivalent). If not, add it to the first task's `package.json`.
+- [ ] Cross-platform run command is documented in Session notes.
+      Use `pnpm --filter <name> <script>` not `pnpm <script> --filter <name>`.
+- [ ] If any task creates an LLM client or tool wrapper, a model selection
+      table exists in that task's Context section.
+- [ ] If programmatic orchestration will invoke write-task or reprise via API,
+      `-api` skill variants (`write-task-api.md`, `reprise-api.md`) exist.
+
+---
+
 ## How to implement a task
 
 Follow these steps exactly for every task. Do not skip any step.
