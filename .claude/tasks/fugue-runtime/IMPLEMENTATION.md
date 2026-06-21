@@ -76,7 +76,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/skills.ts` exporting `loadSkill(name: SkillName): string` that reads `skills/*.md` files from the repo root as system prompt strings.
 **Depends on:** Task 01
 
-- [ ] Task 02 complete (PR merged)
+- [x] Task 02 complete (PR merged) — PR #4, merged 2026-06-20
 
 ---
 
