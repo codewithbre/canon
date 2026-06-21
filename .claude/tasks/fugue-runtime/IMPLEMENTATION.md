@@ -146,7 +146,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Implements `src/index.ts` as a runnable CLI script that parses `--task`, `--repo`, `--issue` args, validates env vars, and calls `runFugue()`.
 **Depends on:** Task 08
 
-- [ ] Task 09 complete (PR merged)
+- [x] Task 09 complete (PR merged) — PR #12, merged 2026-06-21
 
 ---
 
