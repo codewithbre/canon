@@ -136,7 +136,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/orchestrator.ts` with `runFugue()`. Chains all tools end-to-end with parallel fan-out for write-task and verify-task, dependency-ordered implementation, two human-in-the-loop polling gates, and per-step token logging.
 **Depends on:** Tasks 04, 05, 06, 07
 
-- [ ] Task 08 complete (PR merged)
+- [x] Task 08 complete (PR merged) — PR #11, merged 2026-06-21
 
 ---
 
