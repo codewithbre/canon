@@ -1,0 +1,16 @@
+# Package source code — kept private, not published to the public repo
+packages/
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Environment files
+.env
+
+# Build output
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
