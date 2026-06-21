@@ -166,7 +166,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `src/tools/reprise.ts`. `runReprise()` calls Claude with the reprise skill, posts a retrospective GitHub issue labeled `reprise`, and returns the issue URL. Orchestrator calls this as the final step.
 **Depends on:** Tasks 02, 03, 07, 08 (updates orchestrator)
 
-- [ ] Task 11 complete (PR merged)
+- [x] Task 11 complete (PR merged) — PR #13, merged 2026-06-21
 
 ---
 
