@@ -273,19 +273,34 @@ Run `/reprise` to generate the retrospective GitHub issue:
 ## Session notes
 
 ```
-Last session: 2026-06-20
-Current task: Task 01 complete. Task 02 is next.
-Status: Task 01 merged (PR #1). Runtime scaffold exists locally at
-  packages/fugue/runtime/ — gitignored, not in public repo.
-  Task docs and IMPLEMENTATION.md now public on main.
-  pnpm install and pnpm --filter fugue-runtime typecheck both pass locally.
+Last session: 2026-06-21
+Status: ALL 11 TASKS COMPLETE. PRs #1–#15 merged. Implementation done.
 Branch: main (clean)
-Next action: Task 02 (skill-loader) on branch task-02-skill-loader.
-  Tasks 02, 03, and 07 are all unblocked — no mutual dependencies.
-Key decisions carried forward:
-  - invokeLLM() wrapper (not llm.invoke()) — Task 03
-  - fanOut() with allSettled + retry-after — Task 08
-  - OrchestrationContext.limits and .failures — Task 08
-  - Prompt caching: stable content first in message array — Tasks 04-06
+
+Local files (gitignored, packages/ private):
+  src/index.ts          CLI entry — runnable
+  src/orchestrator.ts   runFugue() — full skill chain with Gate 1 + Gate 2
+  src/llm.ts            createLLM(model?), invokeLLM(), TruncatedOutputError
+  src/skills.ts         loadSkill(name: SkillName)
+  src/github.ts         createBranch, commitFile, openPR, postComment, createIssue
+  src/types.ts          Task, TaskDoc, VerifyResult (Zod)
+  src/tools/breakdown   Sonnet — runBreakdown()
+  src/tools/write-task  Sonnet — runWriteTask()
+  src/tools/verify-task Haiku  — runVerifyTask()
+  src/tools/reprise     Haiku  — runReprise()
+
+Next action: Run the POC.
+  node --env-file=packages/fugue/runtime/.env \
+    packages/fugue/runtime/src/index.ts \
+    --task "your task" --repo "owner/repo" --issue <number>
+  OR: label any GitHub issue 'fugue' — Actions workflow fires automatically.
+
+Required: ANTHROPIC_API_KEY, GITHUB_TOKEN in .env
+Optional: LANGCHAIN_API_KEY, LANGCHAIN_TRACING_V2=true, LANGCHAIN_PROJECT=fugue
+
+After POC run: build cxt-manager, wire it into Orchestra at breakpoints.
+Model: breakdown+write-task=claude-sonnet-4-6, verify-task+reprise=claude-haiku-4-5-20251001
+ANTHROPIC_MODEL env var overrides all.
+```
   - pnpm workspace command: pnpm --filter fugue-runtime typecheck (not pnpm typecheck --filter)
 ```
