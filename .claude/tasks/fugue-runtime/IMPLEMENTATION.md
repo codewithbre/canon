@@ -156,7 +156,7 @@ Tasks must be completed in the order listed. Check a task off only when its PR i
 **What it does:** Creates `.github/workflows/fugue.yml` that triggers on issues labeled `fugue` and runs the CLI with the issue title as `--task`.
 **Depends on:** Task 09
 
-- [ ] Task 10 complete (PR merged)
+- [x] Task 10 complete (PR merged) — PR #14, merged 2026-06-21
 
 ---
 
