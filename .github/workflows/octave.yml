@@ -1,4 +1,4 @@
-name: Fugue
+name: Octave
 
 on:
   issues:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   run:
-    if: github.event.label.name == 'fugue'
+    if: github.event.label.name == 'octave'
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -22,9 +22,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run Fugue
+      - name: Run Octave
         run: |
-          npx tsx packages/fugue/runtime/src/index.ts \
+          npx tsx packages/octave/runtime/src/index.ts \
             --task "${{ github.event.issue.title }}" \
             --repo "${{ github.repository }}" \
             --issue "${{ github.event.issue.number }}"
@@ -32,5 +32,5 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
           LANGCHAIN_TRACING_V2: 'true'
-          LANGCHAIN_PROJECT: 'fugue'
+          LANGCHAIN_PROJECT: 'octave'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

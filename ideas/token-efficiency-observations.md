@@ -12,9 +12,9 @@ Prompt caching is working extremely well. Session 1 (153 min, 94 API calls):
 The cache read/create ratio is ~77:1. The system prompt, CLAUDE.md, and
 conversation context are being cached and reused almost perfectly.
 
-## Implication for Fugue runtime design
+## Implication for Octave runtime design
 
-The token efficiency doc (`packages/fugue/docs/token-efficiency.md`) identifies
+The token efficiency doc (`packages/octave/docs/token-efficiency.md`) identifies
 sequential write-task as the biggest waste. The session 1 data confirms the
 fix works: prompt caching collapses the per-call overhead to near-zero.
 
@@ -33,7 +33,7 @@ The `cache_creation` block distinguishes:
 The 1h cache is being used for the large stable system prompt block.
 The 5m cache appears unused in this session (0 tokens).
 
-For the Fugue runtime: skill prompts (~500 tokens each) should use 5m TTL
+For the Octave runtime: skill prompts (~500 tokens each) should use 5m TTL
 since they're stable within a single orchestrator run but don't need 1h.
 The shared context object (scaffold files, README) should also use 5m TTL.
 

@@ -8,11 +8,11 @@ A monorepo of AI coding agents built on a shared philosophy: **constraints enabl
 
 | Package | Role | Status |
 |---|---|---|
-| [`packages/fugue`](packages/fugue) | Build agent — takes intent, breaks it down, implements as PRs | Active |
+| [`packages/octave`](packages/octave) | Build agent — takes intent, breaks it down, implements as PRs | Active |
 | [`packages/coda`](packages/coda) | Test + deploy agent — closes the loop after merge | Planning |
 
 ```
-Fugue  →  builds (plan → implement → PR)
+Octave  →  builds (plan → implement → PR)
 Coda   →  closes (test → deploy → verify)
 ```
 
@@ -84,7 +84,7 @@ orchestra/
 ├── skills/                Seven skill definitions — copy into any project
 ├── templates/             CLAUDE.md and IMPLEMENTATION.md starting points
 └── packages/
-    ├── fugue/             Build agent
+    ├── octave/             Build agent
     ├── coda/              Test + deploy agent (planning)
     └── shared/            Common runtime code (planning)
 ```

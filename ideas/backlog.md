@@ -1,4 +1,4 @@
-# Backlog — Orchestra / Fugue
+# Backlog — Orchestra / Octave
 
 Items captured from the POC session (Goals 1, 2, 3). Address in priority order.
 Each item notes where it was observed.
@@ -19,11 +19,11 @@ Needed:
 - `👎` or comment containing `revise:` → re-run breakdown with the comment
   appended to the intent as additional context
 - `stop` or `abort` → cancel the run, post a closing comment
-- Any other comment → Fugue acknowledges it but continues polling (currently
+- Any other comment → Octave acknowledges it but continues polling (currently
   it just silently ignores it)
 
 ### Gate 2 revision loop
-*Observed: all three POC runs — PR "changes requested" is invisible to Fugue*
+*Observed: all three POC runs — PR "changes requested" is invisible to Octave*
 
 Currently Gate 2 only polls for PR merge. A "Changes requested" review blocks
 forever.
@@ -100,16 +100,16 @@ it to include a test task for each implementation task. Default: off.
 The improvement cycle is currently: reprise identifies gap → human reads it →
 maybe updates skill → maybe improves. There's no automated path.
 
-Option: after reprise posts the issue, Fugue could open a follow-up PR to
+Option: after reprise posts the issue, Octave could open a follow-up PR to
 `orchestra/skills/` with proposed skill updates based on the Suggested
 Improvements section. This would be a new tool: `runSkillUpdate()`.
 
 ### Log file should be structured JSON
-*Observed: fugue.log is human-readable text — hard to parse for metrics*
+*Observed: octave.log is human-readable text — hard to parse for metrics*
 
 Add structured JSON log alongside the human-readable log:
-`--log-file fugue.log` → human text
-`--json-log fugue.json` → structured per-step events with timestamps and tokens
+`--log-file octave.log` → human text
+`--json-log octave.json` → structured per-step events with timestamps and tokens
 
 This makes it easy to build tooling on top of the log data.
 
@@ -117,13 +117,13 @@ This makes it easy to build tooling on top of the log data.
 
 ## 5. Attribution — bot account
 
-*Observed: all runs — issues/PRs appear as codewithbre, not a Fugue agent*
+*Observed: all runs — issues/PRs appear as codewithbre, not a Octave agent*
 
 `FUGUE_GITHUB_TOKEN` env var is wired in `github.ts` (`getBotOctokit()`).
 The token just needs to be set.
 
 Options:
-- Create a GitHub account `fugue-bot`, generate a PAT, set as `FUGUE_GITHUB_TOKEN`
+- Create a GitHub account `octave-bot`, generate a PAT, set as `FUGUE_GITHUB_TOKEN`
 - Create a GitHub App for more official `[bot]` attribution
 
 ---
@@ -134,7 +134,7 @@ Options:
 *Observed: I wrote the calculator CLAUDE.md from assumptions and got the stack wrong*
 
 Convention: always run `/onboard-project` on the target repo before the first
-Fugue run. Add to CLAUDE.md of Orchestra: "Before running Fugue on a target repo,
+Octave run. Add to CLAUDE.md of Orchestra: "Before running Octave on a target repo,
 ensure a CLAUDE.md exists. If none exists, run /onboard-project first."
 
 ### Claude Desktop compatibility acceptance criteria
@@ -157,7 +157,7 @@ produces unexpected output via API, create a `verify-task-api.md` variant.
 
 *See ideas/session-rate-monitoring.md and ideas/dashboard-and-observability.md*
 
-After the first real Fugue run (Goals 1-3 POC complete), build cxt-manager v2
+After the first real Octave run (Goals 1-3 POC complete), build cxt-manager v2
 and wire it into Orchestra at the natural breakpoints:
 - After breakdown: `cxt commit "breakdown complete — N tasks queued"`
 - After each Gate merge: `cxt commit "task X merged, next is Y"`
@@ -171,13 +171,13 @@ This solves the "where are we" problem without a STATUS.md.
 
 *Observed: Actions workflow exists but packages/ is gitignored — runtime not available in CI*
 
-The `.github/workflows/fugue.yml` exists but can't run because the runtime source
+The `.github/workflows/octave.yml` exists but can't run because the runtime source
 is private. Options to fix:
-- Publish `fugue-runtime` to npm (then `npx fugue` works in CI)
-- Make `packages/fugue/runtime/src/` public (breaks the privacy model)
+- Publish `octave-runtime` to npm (then `npx octave` works in CI)
+- Make `packages/octave/runtime/src/` public (breaks the privacy model)
 - Create a separate private runtime repo that Actions checks out
 
-Lowest friction: publish to npm under a scoped package (`@codewithbre/fugue`).
+Lowest friction: publish to npm under a scoped package (`@codewithbre/octave`).
 The public repo would then have a working Actions trigger.
 
 ---
@@ -187,8 +187,8 @@ The public repo would then have a working Actions trigger.
 *See CLAUDE.md — "Coda is not yet scoped. Do not scope it unless asked."*
 
 Coda (test + deploy agent) should be scoped after:
-1. At least one full Fugue run produces code that's actually implemented by a human
+1. At least one full Octave run produces code that's actually implemented by a human
 2. The implemented code needs testing and deployment
-3. The handoff format from Fugue (task docs, PRs) is stable
+3. The handoff format from Octave (task docs, PRs) is stable
 
 Do not scope Coda until then.

@@ -4,14 +4,14 @@ The test and deploy agent. Takes merged code and closes the loop: runs NL-driven
 
 Part of the [Orchestra](../../README.md) monorepo.
 
-## Relationship to Fugue
+## Relationship to Octave
 
 ```
-Fugue  →  builds (plan → implement → PR)
+Octave  →  builds (plan → implement → PR)
 Coda   →  closes (test → deploy → verify)
 ```
 
-Fugue produces PRs. Coda takes those merged PRs to production and confirms the system still works.
+Octave produces PRs. Coda takes those merged PRs to production and confirms the system still works.
 
 ## Status
 

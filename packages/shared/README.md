@@ -1,6 +1,6 @@
 # Shared
 
-Common code used by both Fugue and Coda: TypeScript types, LangChain + LangSmith LLM client, GitHub API client, skill loader.
+Common code used by both Octave and Coda: TypeScript types, LangChain + LangSmith LLM client, GitHub API client, skill loader.
 
 Part of the [Orchestra](../../README.md) monorepo.
 
@@ -13,4 +13,4 @@ Part of the [Orchestra](../../README.md) monorepo.
 
 ## Status
 
-Planning. Will be extracted from `packages/fugue/runtime/` once the runtime is built.
+Planning. Will be extracted from `packages/octave/runtime/` once the runtime is built.

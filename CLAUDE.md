@@ -2,7 +2,7 @@
 
 ## What this repo is
 
-Orchestra is a monorepo of AI coding agents built on the Task Integrity philosophy. It contains the shared skill definitions, docs, and templates that all agents use, plus the agent packages themselves (`packages/fugue`, `packages/coda`).
+Orchestra is a monorepo of AI coding agents built on the Task Integrity philosophy. It contains the shared skill definitions, docs, and templates that all agents use, plus the agent packages themselves (`packages/octave`, `packages/coda`).
 
 This CLAUDE.md is for agents contributing to Orchestra itself. If you are working on a project that has adopted the Orchestra workflow, use that project's CLAUDE.md instead.
 

@@ -51,7 +51,7 @@ This session ran at ~70% of that ceiling.
 
 ## Proposed utility
 
-A `src/monitor.ts` module in the Fugue runtime that an autonomous orchestrator
+A `src/monitor.ts` module in the Octave runtime that an autonomous orchestrator
 can call between tasks to estimate session pressure:
 
 ```typescript

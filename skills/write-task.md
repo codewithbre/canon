@@ -4,7 +4,7 @@ the codebase and this document, must be able to complete the task
 without any other context (this conversation, a breakdown list, or
 other task documents).
 
-**If this project uses programmatic orchestration (Fugue or similar):**
+**If this project uses programmatic orchestration (Octave or similar):**
 A `skills/write-task-api.md` variant is required alongside this skill.
 The `-api` variant produces the document directly with no questions,
 no tool invocations, and no narration. This skill's "ASK where to save"

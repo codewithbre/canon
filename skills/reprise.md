@@ -1,6 +1,6 @@
 Generate a retrospective report for a completed canon workflow run and post it as a GitHub issue.
 
-**If this project uses programmatic orchestration (Fugue or similar):**
+**If this project uses programmatic orchestration (Octave or similar):**
 A `skills/reprise-api.md` variant is required alongside this skill.
 The `-api` variant produces the retrospective body directly with no bash
 commands, no narration, and no preamble. This skill's step 5 (`gh issue create`)
