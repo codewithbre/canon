@@ -1,42 +1,47 @@
-Create a pull request summary for the current changes. Do not
-push or create the PR unless instructed to — produce the summary 
-with github cli commands.
+Create a pull request summary for the current changes.
+This skill has one responsibility: produce a summary that proves
+an intention was met. Do not push, create, or modify the PR unless
+explicitly instructed. This is documentation only.
 
 1. ANALYZE the current branch changes against the base branch.
+   If the changes do not represent a single coherent functional
+   change, flag this before producing a summary.
 
 2. PRODUCE the following:
 
    ## Title
-   A concise title following conventional commit format:
-   type(scope): description
-   Types: feat, fix, refactor, test, docs, chore
+   A concise statement of what is now true that wasn't before.
+   Describe the outcome. Not the mechanism.
 
-   ## Summary
-   2-3 sentences describing what this PR does and why.
+   ## Intention
+   What was the goal? What problem was being solved or what
+   capability was being added?
+
+   ## Outcome
+   What is now different? Describe the end state as an observable
+   result.
+
+   ## Value
+   What does this change enable, unblock, or improve?
 
    ## Changes
-   A list of every file modified, created, or deleted, grouped
-   by category:
-   - State the intention of the code change and the output/result of the change
-   - semantically organize by related code changes vs file by file list
+   A high-level summary of what changed. Only call out specific
+   files if they were the primary source of change or are
+   significant to understanding the PR.
 
-   ## How to Verify
-   Step-by-step instructions for reviewing and testing this PR.
+   ## Verification
+   How to confirm the outcome was achieved. Map to the task's
+   acceptance criteria where they exist.
 
    ## Scope Confirmation
-   - [ ] All changes are directly related to the stated task.
+   - [ ] All changes are directly related to the stated intention.
    - [ ] No unrelated refactoring is included.
    - [ ] No new dependencies were added (or additions were approved).
    - [ ] All code is strongly typed with no `any` or lint suppressions.
    - [ ] Each commit represents a single functional change.
 
-   ## Known Limitations / Follow-up
-   Any items that are out of scope but worth noting for future work.
+3. After completing step 2, verify: does the Intention align with
+   the Outcome? Does the Outcome justify the Value claim? Update
+   if not.
 
-3. If the changes do not look like a coherent single functional
-   change, flag this. State what appears to be bundled together
-   and suggest how to split it.
-
-4. Ensure that properly completed step 2, re-review and update if needed
-
-Target branch: $ARGUMENTS
+Target branch: [branch to compare against the base branch]
