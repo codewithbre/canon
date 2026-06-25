@@ -1,126 +1,167 @@
 # Workflow
 
-The Orchestra workflow is a chain of seven skills invoked in sequence. Each step has a defined input, a defined output, and a human checkpoint before the next step begins.
+The Orchestra workflow is an ordered pipeline of skills. Each phase has a
+defined input, a defined output, and a human checkpoint before the next phase
+begins. Phases run in dependency order; within a phase, independent work can
+run in parallel when the task breakdown allows it. Run it interactively in
+Claude Code or programmatically via the Octave runtime.
 
 ```
-/breakdown → /write-task → /verify-task → /create-tracker → /implement → /create-pr → /reprise
+/workflow → /breakdown → /write-task → /verify-task → /create-tracker
+         → /implement → [Human UAT] → /feedback → /create-pr → /reprise
 ```
 
 ---
 
-## The seven steps
+## The steps
 
-### 1. /breakdown
+### 1. /workflow
 
-**Input:** A feature description or problem statement from the human.
-**Output:** An ordered list of scoped, verifiable tasks with dependencies.
-**Human checkpoint:** Review and approve the task list before moving to step 2.
+**Input:** A description of the work to be done.
+**Output:** A completed planning and implementation cycle.
+**Human checkpoint:** The breakdown is the only gate where the plan can change.
 
-The breakdown agent reads the codebase, identifies what needs to change, and produces tasks that each meet the Task Integrity criteria: single functional change, clear intent, clear location, verifiable in one pass.
-
-Reject tasks that are too broad. Ask the agent to re-scope them. The quality of the breakdown determines the quality of everything that follows.
+Orchestrates the full cycle. Runs breakdown, enforces the human approval gate,
+then runs write-task, verify-task, and create-tracker in phase order. Write-task
+and verify-task fan out across tasks when run programmatically; implement runs
+in parallel for tasks with no outstanding dependencies. After implementation
+and UAT, routes to feedback or create-pr.
 
 ---
 
-### 2. /write-task
+### 2. /breakdown
+
+**Input:** A feature description or problem statement.
+**Output:** An ordered, confidence-rated task list with dependencies, plus an
+`overview.md` capturing the codebase analysis done during breakdown.
+**Human checkpoint:** Review and approve the task list. Reject or refine any
+task that is too vague, too large, or has unclear acceptance criteria.
+
+The breakdown is where scope, intent, and task boundaries are decided. Every
+step after formalizes and verifies that decision. The quality of the breakdown
+determines the quality of everything that follows.
+
+Each task receives a confidence rating (HIGH / MEDIUM / LOW). LOW confidence
+tasks surface a gap that needs human direction before a task document can be
+written.
+
+---
+
+### 3. /write-task
 
 **Input:** One approved task from the breakdown.
-**Output:** A standalone markdown document in `.claude/tasks/` that contains everything an isolated agent needs to implement the task from scratch.
-**Human checkpoint:** Read the doc before verification. If anything seems wrong, fix it now — not during implementation.
+**Output:** A standalone markdown document in `.claude/tasks/` that contains
+everything an isolated agent needs to implement the task from scratch.
+**Human checkpoint:** Read the document before verification. If anything is
+wrong, fix it now, not during implementation.
 
-The task doc must be self-contained. The agent implementing it will have access only to the codebase and the document — no conversation history, no other task docs, no shared context.
+The task document is the delegation contract. The agent implementing it will
+have access only to the document and the codebase, no conversation history,
+no other task documents, no shared context. All relevant context must be in
+the file.
 
-Invoke `/write-task` once per task. For 8 tasks, invoke it 8 times.
+Invoke once per task. Each invocation produces exactly one document.
 
 ---
 
-### 3. /verify-task
+### 4. /verify-task
 
 **Input:** A task document or a directory of task documents.
-**Output:** A gap report — confidence rating per document, list of anything that would block a cold agent from completing it.
-**Human checkpoint:** Act on gaps before proceeding. A REWRITE finding must be addressed; ADD CONTEXT findings should be addressed; ASK AUTHOR findings require your input.
+**Output:** A confidence rating per document and a gap report, anything that
+would prevent a cold agent from completing the task correctly.
+**Human checkpoint:** Act on gaps before proceeding. REWRITE findings must be
+addressed. ADD CONTEXT findings should be addressed. ASK AUTHOR findings
+require your input.
 
-Run `/verify-task` on the full tasks directory at once to verify all docs in one pass.
+Run on the full task directory to verify all documents in one pass. The
+verifier agent reads each document cold, exactly as the implementing agent
+would.
 
 ---
 
-### 4. /create-tracker
+### 5. /create-tracker
 
 **Input:** A directory of verified task documents.
-**Output:** An IMPLEMENTATION.md file with the task checklist, dependency graph, implementation protocol, PR template, and session notes section.
-**Human checkpoint:** Review the dependency order. Correct it if the agent misread dependencies.
+**Output:** An IMPLEMENTATION.md with the task checklist, dependency graph,
+and session handoff protocol.
+**Human checkpoint:** Review the dependency order. Correct it if the agent
+misread dependencies.
 
-The tracker is the session handoff document. Any agent in any future session can read it and know exactly where things stand.
-
----
-
-### 5. /implement
-
-**Input:** A task document (specified by the human or read from IMPLEMENTATION.md).
-**Output:** Code changes committed to a branch, ready for PR.
-**Human checkpoint:** Review the PR before merging. Check the task off in IMPLEMENTATION.md after merge.
-
-The implement agent reads the task doc in full, restates what it will change and what is out of scope, then executes only within those bounds. One task per session.
+The tracker is the session handoff document. Any agent in any future session
+can read it and know exactly where work stands.
 
 ---
 
-### 6. /create-pr
+### 6. /implement
 
-**Input:** The current branch diff against main.
-**Output:** A formatted PR title, summary, file list, verification checklist, and scope confirmation.
+**Input:** A task document.
+**Output:** Code committed to a branch, verified against each acceptance
+criterion, ready for PR.
+**Human checkpoint:** Review the PR before merging.
+
+The implementing agent reads the task document in full, restates what it will
+change and what is out of scope, implements only within those bounds, runs the
+project's checks, and verifies each acceptance criterion before reporting
+complete.
+
+Designed for a low-reasoning model. By the time a task reaches this step,
+there is no ambiguity left to resolve.
+
+---
+
+### 7. /feedback
+
+**Input:** A UAT finding, what was observed versus what was expected.
+**Output:** A correction appended to the existing task document without
+modifying its original content.
+**Human checkpoint:** Confirm the gap is accurately described before the
+correction is written.
+
+Used when UAT reveals the outcome fell short of the stated intention. The
+correction is implemented before /create-pr is invoked.
+
+---
+
+### 8. /create-pr
+
+**Input:** The current branch diff.
+**Output:** A PR summary proving the intention was met: intention, outcome,
+value, changes, verification steps.
 **Human checkpoint:** Review the PR on GitHub. Merge when satisfied.
 
 ---
 
-### 7. /reprise
+### 9. /reprise
 
-**Input:** The IMPLEMENTATION.md for the completed project (or directory path).
-**Output:** A GitHub issue labeled `reprise` containing: original goal, what was delivered, what worked well, shortcomings (specific to skill or step), suggested improvements (new skill / skill update / workflow change), and metrics if available from LangSmith.
-**Human checkpoint:** Read the issue. Use findings to improve the skill definitions or workflow for the next project.
+**Input:** The IMPLEMENTATION.md for the completed project.
+**Output:** A GitHub issue labeled `reprise` containing: original goal, what
+was delivered, what worked, shortcomings by step, suggested improvements, and
+metrics.
+**Human checkpoint:** Read the issue. Use findings to improve the skill
+definitions for the next project.
 
-The reprise closes the feedback loop. Without it, shortcomings surface only in conversation and are forgotten. With it, they become a permanent record that improves the system over time.
+Closes the feedback loop. Without it, shortcomings surface only in conversation
+and are forgotten. With it, they become a permanent record that improves the
+system over time.
 
 ---
 
-## Worked example
+## Programmatic execution
 
-**Feature request:** "Add a `getIntervalSemitones` function to the theory package."
+The full pipeline can also be run by the Octave runtime without manual skill
+invocations. Octave takes an intent from a GitHub issue, runs breakdown,
+fans out write-task and verify-task in parallel, commits task documents as a
+PR, and waits at two human gates: breakdown approval (Gate 1) and PR merge
+(Gate 2). Implementation fans out by dependency group: tasks with no blockers
+run concurrently; dependent tasks wait until their prerequisites merge.
 
-**Step 1 - /breakdown:**
-Agent reads `packages/theory/src/intervals.ts`, `src/index.ts`, and the existing test structure. Produces one task:
-> Add `getIntervalSemitones(interval: IntervalId): number` to `intervals.ts`, export from `index.ts`.
-
-Human approves.
-
-**Step 2 - /write-task:**
-Agent writes `.claude/tasks/task-01-get-interval-semitones.md` containing: outcome (what the function returns), why (direct lookup, root/mode do not affect semitone count), context (relevant files and types), scope (two files), out of scope (no changes to engine.ts or scales.ts), acceptance criteria (five verifiable conditions).
-
-Human reads it. Looks good.
-
-**Step 3 - /verify-task:**
-Agent reads the doc cold. Reports: confidence HIGH, no gaps found.
-
-**Step 4 - /create-tracker:**
-Agent reads the single task doc, generates IMPLEMENTATION.md with checklist (one task), dependency graph (none), and protocol.
-
-**Step 5 - /implement:**
-Agent checks out branch `task-01-get-interval-semitones`, adds the function, exports it, runs typecheck. Opens PR.
-
-**Step 6 - /create-pr:**
-Agent produces: `feat(theory): add getIntervalSemitones lookup function` with summary, file list (`intervals.ts`, `index.ts`), and verification steps. Human reviews, merges.
-
-**Step 7 - /reprise:**
-After all tasks are merged, agent reads IMPLEMENTATION.md, identifies the original goal vs what was delivered, surfaces shortcomings in the skill chain, suggests improvements, and posts everything as a GitHub issue labeled `reprise`. Human reviews the issue and uses it to improve the workflow for the next project.
-
-Total time on task: one session. Total human decisions: approve breakdown, read task doc, review PR, review reprise issue.
+See `packages/octave/docs/runtime-design.md` for the full runtime design.
 
 ---
 
 ## Re-entering the workflow mid-chain
 
-You don't always start at step 1.
-
 - **Adding a task to an existing project:** Start at `/write-task`, skip `/breakdown`.
 - **Resuming after a gap:** Read IMPLEMENTATION.md, find the first unchecked task, go straight to `/implement`.
-- **Something broke in a completed task:** Write a new task doc with `/write-task` for the fix. Do not amend the original.
-- **Scope creep during implementation:** Stop. Write a new task for the additional work. The current task's scope does not change.
+- **UAT revealed a gap:** Use `/feedback` to amend the task document. Do not modify the original content.
+- **Scope creep during implementation:** Stop. Write a new task doc with `/write-task`. The current task's scope does not change.

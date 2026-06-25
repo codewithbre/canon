@@ -1,90 +1,159 @@
 # Architecture
 
-## Current: Sequential single-agent
+## Agent harness family
 
-Today, canon runs as a sequential workflow through one Claude Code instance. The human invokes each skill manually, one at a time:
+Orchestra's agents are built on a set of standalone, agnostic harnesses. Each
+harness has a single contract and can be used independently of Orchestra or
+any other agent.
 
-```
-Human invokes /breakdown
-    → agent produces task list
-Human invokes /write-task (×N, once per task)
-    → agent produces N task docs
-Human invokes /verify-task
-    → agent produces gap report
-Human invokes /create-tracker
-    → agent produces IMPLEMENTATION.md
-Human invokes /implement (per task, per session)
-    → agent produces branch + PR
-```
+| Harness | Contract |
+|---|---|
+| [plan-to-pr](https://github.com/codewithbre/plan-to-pr) | intent → task documents |
+| [ai-eval-agent](https://github.com/codewithbre/ai-eval-agent) | output → eval report |
 
-This works and produces reliable results. The cost is time — writing N task docs sequentially means N skill-load cycles and N codebase context re-derivations, even when the same files are relevant to multiple tasks.
+Harnesses are agnostic to each other. plan-to-pr has no opinion on how task
+documents are implemented or tested. ai-eval-agent has no opinion on how the
+output it evaluates was produced. This is intentional. Working across different points in the pipeline requires
+portable harnesses that compose into any agentic system or workflow, not ones
+that are coupled to a specific agent.
 
 ---
 
-## Where token and time efficiency is lost
+## Execution modes
 
-**1. Sequential /write-task**
-Each invocation loads the full skill prompt and re-reads the codebase files relevant to that task. For 10 tasks that share the same source files, that's 10x the reads. A parallel approach would read files once at breakdown time and pass the extracted context to each write-task agent.
+### Interactive (Claude Code/Cursor)
 
-**2. Sequential /verify-task**
-Each task doc can be verified independently. Running 10 verifiers sequentially when they could run in parallel wastes wall-clock time proportional to N.
+The human invokes each skill manually, one at a time or via a skill router, in
+a coding session. The skill chain runs sequentially with the human at each
+checkpoint.
 
-**3. No persistent context across sessions**
-The IMPLEMENTATION.md tracker solves the session-handoff problem for humans, but agents still re-derive codebase context at the start of each session. Prompt caching (Anthropic's cache_control mechanism) would help here for stable files.
+```
+Human: /breakdown
+  → agent produces task list, confidence ratings, overview.md
+Human: /write-task (once per approved task)
+  → agent produces task documents
+Human: /verify-task
+  → agent produces gap report
+Human: /create-tracker
+  → agent produces IMPLEMENTATION.md
+Human: /implement (per task, per session)
+  → agent produces committed code
+Human: /create-pr
+  → agent produces PR description
+```
+
+### Programmatic/Autonomous workflows (Octave runtime)
+
+The Octave runtime runs the planning chain automatically, without manual skill
+invocations. It calls the Claude API directly, manages GitHub, and waits at
+two human gates.
+
+```
+GitHub issue (intent)
+  → Octave: load scaffold files from target repo
+  → Octave: run breakdown
+  → [Gate 1: human approves breakdown via 👍 or "approved" comment]
+  → Octave: fan-out write-task (parallel, N workers)
+  → Octave: fan-out verify-task (parallel, N workers)
+  → Octave: commit task documents, open PR
+  → [Gate 2: human merges PR]
+  → Octave: run reprise, post retrospective issue
+```
+
+The two gates are the only points where a human must act. Everything between
+them runs autonomously.
 
 ---
 
-## Future: Orchestrator-worker fan-out
+## Octave runtime internals
 
-The sequential model is the manual version of what an orchestrator-worker system would automate:
+`packages/octave/runtime/src/`
 
+### Orchestration
+
+`orchestrator.ts` implements the full planning pipeline. Key patterns:
+
+**Sequential chain**: top-level steps run in order. Each step's output is
+the next step's input.
+
+**Parallel fan-out**: write-task and verify-task run concurrently across all
+tasks. `fanOut()` processes items in configurable chunks with retry logic:
+
+```ts
+limits: {
+  concurrency: 4,     // parallel workers per chunk
+  maxRetries: 3,      // retries before marking as failed
+  interChunkDelayMs: 500
+}
 ```
-Orchestrator
-    └── runs /breakdown → task list
-    └── fans out: N parallel write-task workers
-          ├── Worker A: task-01.md
-          ├── Worker B: task-02.md
-          └── ...Worker N: task-N.md
-    └── fans out: N parallel verify workers
-          ├── Verifier A: task-01.md
-          └── ...Verifier N: task-N.md
-    └── runs /create-tracker
-    └── sequential: implement workers (respecting dependency order)
-          ├── Worker A: task-01 → PR
-          └── Worker B: task-02 → PR (after task-01 merges if dependent)
+
+**Failure tracking**: failed workers are collected in `ctx.failures`, never
+silently dropped. If any failures or LOW-confidence verify results exist, Octave
+posts a gap report and stops before committing.
+
+**Dependency ordering**: `topologicalSort()` orders task documents by their
+`dependsOn` fields before committing, ensuring the PR presents tasks in safe
+execution order.
+
+### Human gates
+
+**Gate 1**: Octave posts the task breakdown as a GitHub issue comment and
+polls for a 👍 reaction or an "approved" comment before proceeding.
+
+**Gate 2**: Octave polls for the task-doc PR to be merged before running
+reprise.
+
+### Context scoping
+
+Scaffold files (README.md, CLAUDE.md, package.json) are loaded once from the
+target repo and passed as `codebaseSummary` to each write-task worker. Each
+worker receives the summary plus one task, nothing else.
+
+### Prompt caching
+
+Skill prompts are passed as cached system message blocks:
+
+```ts
+new SystemMessage({
+  content: [{
+    type: 'text',
+    text: skillContent,
+    cache_control: { type: 'ephemeral' },
+  }],
+})
 ```
 
-The Agent tool in Claude Code already supports background agents with `run_in_background: true`. The infrastructure exists. The constraint today is subagent model availability and coordination overhead — both solvable.
+With N parallel write-task workers, the skill prompt is paid for once and
+read at ~10% cost on every subsequent call.
 
-### What the orchestrator owns
+### Model selection
 
-- Invoking `/breakdown` and extracting the structured task list
-- Reading shared codebase files once and passing relevant context to each worker
-- Spawning write-task workers in parallel
-- Collecting their outputs and spawning verify workers in parallel
-- Running `/create-tracker` after all verifications pass
-- Spawning implement workers sequentially, respecting task dependencies
-- Tracking completion and surfacing failures
-
-### What stays human
-
-- Approving the breakdown output before workers are spawned
-- Reviewing PRs before merging
-- Resolving `ASK AUTHOR` findings from verify agents
-- Making architectural decisions that appear as flags in the breakdown
-
-The orchestrator handles mechanics. Humans handle judgment. That boundary does not change in the multi-agent model.
+| Step | Model | Reason |
+|---|---|---|
+| breakdown | `claude-sonnet-4-6` | Highest ambiguity: requires reasoning |
+| write-task | `claude-sonnet-4-6` | Context synthesis across codebase and task |
+| verify-task | `claude-haiku-4-5-20251001` | Structural check: does the doc meet criteria |
+| reprise | `claude-haiku-4-5-20251001` | Formatting structured run data into a report |
 
 ---
 
-## Relationship to existing tools
+## What stays human
 
-Canon is not a replacement for CI/CD, test frameworks, or deployment pipelines. It is a layer that sits between "human has an idea" and "code exists in a PR ready for review."
+The orchestrator handles the mechanics of orchestration and implementation.
+Humans handle judgment and approvals. This does not change regardless of how
+much of the chain is automated.
 
-```
-Human idea
-    └── Canon workflow → PR
-                            └── CI/CD → Merge → Deploy
-```
+- Approving the breakdown before task documents are written
+- Reviewing task documents before the implementation PR is merged
+- UAT after implementation, did the outcome match the intention
+- Architectural decisions surfaced as flags during breakdown
+- Resolving ASK AUTHOR findings from verify-task
 
-Canon's output is always a PR. What happens after the PR merges is out of scope.
+---
+
+## Planned agents
+
+| Package | Role | Status |
+|---|---|---|
+| `packages/octave` | Build agent: planning through task docs | Active |
+| `packages/coda` | Test and deploy agent | Under Development |
