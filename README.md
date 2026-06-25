@@ -13,8 +13,19 @@ A monorepo of AI coding agents built on a shared philosophy: **constraints enabl
 
 ```
 Octave  →  builds (plan → implement → PR)
-Coda   →  closes (test → deploy → verify)
+Coda    →  closes (test → deploy → verify)
 ```
+
+---
+
+## Agent harness family
+
+Orchestra's agents are built on a set of standalone, agnostic harnesses. Each harness has a single contract and can be used independently of Orchestra.
+
+| Harness | Contract | Repo |
+|---|---|---|
+| [plan-to-pr](https://github.com/codewithbre/plan-to-pr) | intent → task docs | Standalone |
+| [ai-eval-agent](https://github.com/codewithbre/ai-eval-agent) | output → eval report | Standalone |
 
 ---
 
@@ -85,6 +96,6 @@ orchestra/
 ├── templates/             CLAUDE.md and IMPLEMENTATION.md starting points
 └── packages/
     ├── octave/             Build agent
-    ├── coda/              Test + deploy agent (planning)
-    └── shared/            Common runtime code (planning)
+    ├── coda/              Test + deploy agent (under development)
+    └── shared/            Common runtime code (under development)
 ```
