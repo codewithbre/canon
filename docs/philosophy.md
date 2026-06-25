@@ -2,7 +2,7 @@
 
 ## The core claim
 
-Constraints don't restrict AI agents. They make them reliable.
+Constraints make AI reliable.
 
 A less capable model given a precise, scoped, verifiable task will consistently outperform a smarter model given a vague prompt. The bottleneck in AI-assisted development is almost never the model's intelligence. It is the quality of the instructions.
 
